@@ -1,0 +1,4 @@
+# Screenshot Paths
+./screenshots/events.png
+./screenshots/welcome.png
+./screenshots/login.png
