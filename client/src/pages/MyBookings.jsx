@@ -4,14 +4,17 @@ import bookingService from '../services/bookingService';
 function MyBookings() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     async function fetchBookings() {
       try {
+        setError('');
         const data = await bookingService.getUserBookings();
         setBookings(data);
-      } catch (error) {
-        console.error('Failed to fetch bookings', error);
+      } catch (err) {
+        console.error('Failed to fetch bookings', err);
+        setError('Unable to load your bookings. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -42,55 +45,30 @@ function MyBookings() {
           box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
 
-        .bookings-header {
-          text-align: center;
-          margin-bottom: 30px;
-        }
+        .bookings-header { text-align: center; margin-bottom: 30px; }
+        .bookings-header h2 { font-size: 2.5rem; color: #f1f1f1; }
+        .loading-text, .no-bookings, .error-text { text-align: center; font-size: 1.2rem; margin-top: 30px; color: #f8f8f8; }
+        .error-text { background: rgba(120, 0, 0, 0.65); padding: 12px; border-radius: 8px; }
+        .booking-list { margin-top: 20px; }
+        .booking-item { background: rgba(255, 255, 255, 0.15); padding: 15px 20px; margin-bottom: 15px; border-radius: 10px; transition: transform 0.3s ease; color: #ffffff; }
+        .booking-item:hover { transform: scale(1.03); background: rgba(255, 255, 255, 0.25); }
+        .booking-item p { margin: 8px 0; }
 
-        .bookings-header h2 {
-          font-size: 2.5rem;
-          color: #f1f1f1;
-        }
-
-        .loading-text,
-        .no-bookings {
-          text-align: center;
-          font-size: 1.2rem;
-          margin-top: 30px;
-          color: #f8f8f8;
-        }
-
-        .booking-list {
-          margin-top: 20px;
-        }
-
-        .booking-item {
-          background: rgba(255, 255, 255, 0.15);
-          padding: 15px 20px;
-          margin-bottom: 15px;
-          border-radius: 10px;
-          transition: transform 0.3s ease;
-          color: #ffffff;
-        }
-
-        .booking-item:hover {
-          transform: scale(1.03);
-          background: rgba(255, 255, 255, 0.25);
-        }
-
-        .booking-item p {
-          margin: 8px 0;
+        @media (max-width: 600px) {
+          .bookings-container { padding: 20px 12px; }
+          .bookings-content { padding: 24px 16px; }
+          .bookings-header h2 { font-size: 2rem; }
         }
       `}</style>
 
       <div className="bookings-container">
         <div className="bookings-content">
-          <div className="bookings-header">
-            <h2>My Bookings</h2>
-          </div>
+          <div className="bookings-header"><h2>My Bookings</h2></div>
 
           {loading ? (
             <p className="loading-text">Loading your bookings...</p>
+          ) : error ? (
+            <p className="error-text" role="alert">{error}</p>
           ) : bookings.length === 0 ? (
             <p className="no-bookings">You have no bookings.</p>
           ) : (
