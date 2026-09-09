@@ -2,18 +2,20 @@ import React, { useEffect, useState } from 'react';
 import EventCard from '../components/EventCard';
 import eventService from '../services/eventService';
 
-
 function HomePage() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     async function fetchEvents() {
       try {
+        setError('');
         const data = await eventService.getAllEvents();
         setEvents(data);
-      } catch (error) {
-        console.error('Failed to fetch events', error);
+      } catch (err) {
+        console.error('Failed to fetch events', err);
+        setError('Unable to load events. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -21,7 +23,9 @@ function HomePage() {
     fetchEvents();
   }, []);
 
-  if (loading) return <p style={{ textAlign: 'center', marginTop: '2rem', fontSize: '1.2rem' }}>Loading events...</p>;
+  if (loading) {
+    return <p style={{ textAlign: 'center', marginTop: '2rem', fontSize: '1.2rem' }}>Loading events...</p>;
+  }
 
   return (
     <div
@@ -39,7 +43,11 @@ function HomePage() {
         Upcoming Events
       </h2>
 
-      {events.length === 0 ? (
+      {error ? (
+        <p role="alert" style={{ textAlign: 'center', fontSize: '1.2rem', background: 'rgba(0, 0, 0, 0.65)', padding: '1rem', borderRadius: '10px', maxWidth: '600px', margin: '0 auto' }}>
+          {error}
+        </p>
+      ) : events.length === 0 ? (
         <p style={{ textAlign: 'center', fontSize: '1.2rem', textShadow: '1px 1px 4px rgba(0,0,0,0.6)' }}>
           No events available.
         </p>
@@ -53,7 +61,7 @@ function HomePage() {
             margin: '0 auto',
           }}
         >
-          {events.map(event => (
+          {events.map((event) => (
             <div
               key={event.id}
               style={{
@@ -64,10 +72,9 @@ function HomePage() {
                 padding: '1rem',
                 transition: 'transform 0.3s ease',
               }}
-              onMouseEnter={e => (e.currentTarget.style.transform = 'scale(1.05)')}
-              onMouseLeave={e => (e.currentTarget.style.transform = 'scale(1)')}
+              onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.05)')}
+              onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
             >
-              {/* Pass event to your existing EventCard */}
               <EventCard event={event} />
             </div>
           ))}
